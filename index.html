@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everson L. Santana | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+        .project-card:hover .project-image { transform: scale(1.03); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans">
+
+    <nav class="fixed w-full z-50 glass border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <span class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent italic">
+                &lt;ES /&gt;
+            </span>
+            <div class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#home" class="hover:text-indigo-400 transition">Início</a>
+                <a href="#about" class="hover:text-indigo-400 transition">Sobre</a>
+                <a href="#projects" class="hover:text-indigo-400 transition">Projetos</a>
+                <a href="#experience" class="hover:text-indigo-400 transition">Experiência</a>
+            </div>
+            <a href="mailto:urso.net@gmail.com" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition">Contato</a>
+        </div>
+    </nav>
+
+    <section id="home" class="pt-32 pb-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6">Everson L. Santana</h1>
+            <p class="text-xl md:text-2xl text-indigo-400 font-medium mb-8">
+                Desenvolvedor PHP Pleno <span class="text-slate-500 text-lg">| Modernização de Legados & DevOps</span>
+            </p>
+            <div class="flex justify-center space-x-6">
+                <a href="https://github.com/netrix1" target="_blank" class="text-3xl hover:text-white transition"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/everson-luiz-santana/" target="_blank" class="text-3xl hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                <a href="https://wa.me/5511960801323" target="_blank" class="text-3xl hover:text-white transition"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 bg-slate-900/50">
+        <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12">
+            <div>
+                <h2 class="text-3xl font-bold mb-6 flex items-center">
+                    <span class="w-8 h-1 bg-indigo-500 mr-4"></span>Sobre mim
+                </h2>
+                <p class="text-slate-400 leading-relaxed mb-6">
+                    Foco em modernização de sistemas, segurança (OWASP) e ambientes containerizados. 
+                    Experiência sólida na migração de código legado (PHP 5.x) para stacks atuais PHP 8+, 
+                    garantindo builds reprodutíveis com Docker e CI/CD.
+                </p>
+                <div class="space-y-2">
+                    <p><strong>📍 Localização:</strong> São Paulo, SP (Remoto)</p>
+                    <p><strong>🎓 Formação:</strong> Redes de Computadores (Láurea Acadêmica)</p>
+                    <p><strong>🌎 Idiomas:</strong> Português (Nativo), Inglês (Intermediário - Duolingo 72)</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                    <h3 class="text-indigo-400 font-bold mb-2">Back-end</h3>
+                    <p class="text-xs text-slate-400">PHP 7/8, Laravel, CodeIgniter, MySQL, SQL Server, Unit Testing</p>
+                </div>
+                <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                    <h3 class="text-indigo-400 font-bold mb-2">DevOps</h3>
+                    <p class="text-xs text-slate-400">Docker, CI/CD, Azure DevOps, Debian, WSL2, S3 Integrations</p>
+                </div>
+                <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                    <h3 class="text-indigo-400 font-bold mb-2">Segurança</h3>
+                    <p class="text-xs text-slate-400">OWASP Práticas, CVE Mitigation, MIME Validation</p>
+                </div>
+                <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                    <h3 class="text-indigo-400 font-bold mb-2">Front-end</h3>
+                    <p class="text-xs text-slate-400">React, TypeScript, JS ES6+, Bootstrap 5, Tailwind</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold mb-16 text-center italic underline decoration-indigo-500">Projetos em Destaque</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                
+                <div class="project-card bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 transition shadow-xl">
+                    <div class="relative h-64 overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/800x600/1e293b/4f46e5?text=Templodesk+Screenshot" alt="Templodesk" class="project-image w-full h-full object-cover transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-2 text-white">Templodesk</h3>
+                        <p class="text-slate-400 text-sm mb-4">Sistema completo de gestão para igrejas de pequeno e médio porte.</p>
+                        <div class="flex space-x-3">
+                            <a href="http://templodesk.com/" target="_blank" class="text-indigo-400 hover:text-white flex items-center gap-2"><i class="fas fa-external-link-alt"></i> Visitar Site</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 transition shadow-xl">
+                    <div class="relative h-64 overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/800x600/1e293b/06b6d4?text=MojiTranslateAI+Screenshot" alt="MojiTranslateAI" class="project-image w-full h-full object-cover transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-2 text-white">MojiTranslateAI</h3>
+                        <p class="text-slate-400 text-sm mb-4">Pipeline de IA para tradução automática de Mangás (OCR, Limpeza e Diagramação).</p>
+                        <div class="flex space-x-3">
+                            <a href="https://github.com/netrix1/MojiTranslateAI" target="_blank" class="text-indigo-400 hover:text-white flex items-center gap-2"><i class="fab fa-github"></i> Ver Código</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 transition shadow-xl">
+                    <div class="relative h-64 overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/800x600/1e293b/4f46e5?text=Youtube-Lyrics+Screenshot" alt="Youtube-Lyrics" class="project-image w-full h-full object-cover transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-2 text-white">Youtube-Lyrics</h3>
+                        <p class="text-slate-400 text-sm mb-4">Sistema de projeção de letras sincronizadas em tempo real com o YouTube.</p>
+                        <span class="text-xs font-mono text-slate-500 uppercase">Em desenvolvimento</span>
+                    </div>
+                </div>
+
+                <div class="project-card bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 transition shadow-xl">
+                    <div class="relative h-64 overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/800x600/1e293b/06b6d4?text=ResumeMe+Screenshot" alt="ResumeMe" class="project-image w-full h-full object-cover transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-2 text-white">ResumeMe</h3>
+                        <p class="text-slate-400 text-sm mb-4">IA especialista em extração de dados estruturados de currículos via Foto/PDF/DOCX.</p>
+                        <span class="text-xs font-mono text-indigo-500 uppercase">Inteligência Artificial</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-20 bg-slate-900/50 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-12 flex items-center">Experiência</h2>
+            
+            <div class="space-y-12 border-l-2 border-indigo-600 pl-8 relative">
+                
+                <div class="relative">
+                    <div class="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-indigo-600 border-4 border-slate-950"></div>
+                    <h3 class="text-xl font-bold">PD Case Informática Ltda</h3>
+                    <p class="text-indigo-400 italic">Desenvolvedor PHP Pleno (2023 - Atual)</p>
+                    <p class="mt-2 text-slate-400 text-sm">Modernização de legados PHP 5/7 → 8, padronização de Dockerfiles e reforço em segurança OWASP.</p>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-indigo-600 border-4 border-slate-950"></div>
+                    <h3 class="text-xl font-bold">Peoplenect</h3>
+                    <p class="text-indigo-400 italic">Consultor Técnico & Desenvolvedor Pleno (2019 - 2022)</p>
+                    <p class="mt-2 text-slate-400 text-sm">Desenvolvimento de projetos Greenfield (Laravel + React), migração de telas para Bootstrap 5 e gestão de ATS.</p>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-indigo-600 border-4 border-slate-950"></div>
+                    <h3 class="text-xl font-bold">HelpMaisCredito</h3>
+                    <p class="text-indigo-400 italic">Desenvolvedor Fullstack (2018 - 2019)</p>
+                    <p class="mt-2 text-slate-400 text-sm">Sistemas internos com PHP, MySQL e suporte transversal.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center border-t border-slate-800 text-slate-500 text-sm">
+        <p>© 2026 Everson L. Santana. Desenvolvido com PHP, Tailwind e Café.</p>
+    </footer>
+
+</body>
+</html>
