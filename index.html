@@ -502,6 +502,12 @@
     </p>
 </footer>
 
+<div id="imageModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/95 p-4 backdrop-blur-md cursor-zoom-out">
+    <span class="absolute top-6 right-8 text-white text-5xl cursor-pointer hover:text-indigo-500 transition-all">&times;</span>
+
+    <img id="modalImage" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl border border-slate-800 transition-transform duration-300 scale-95" src="" alt="">
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const interBubble = document.querySelector('.interactive');
@@ -525,6 +531,45 @@
         });
 
         move();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = modal.querySelector('span');
+        const portfolioImages = document.querySelectorAll('#projects img');
+
+        // Abre o modal ao clicar em qualquer imagem do portfólio
+        portfolioImages.forEach(img => {
+            img.classList.add('cursor-zoom-in'); // Adiciona o ícone de zoom no mouse
+            img.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                modalImg.src = img.src;
+                modalImg.alt = img.alt;
+                document.body.style.overflow = 'hidden'; // Trava o scroll do site
+
+                // Pequeno delay para a animação de entrada (scale)
+                setTimeout(() => {
+                    modalImg.classList.remove('scale-95');
+                    modalImg.classList.add('scale-100');
+                }, 10);
+            });
+        });
+
+        // Função para fechar o modal
+        const closeModal = () => {
+            modalImg.classList.remove('scale-100');
+            modalImg.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Destrava o scroll
+            }, 200);
+        };
+
+        // Fecha ao clicar no 'X', no fundo escuro ou apertar 'Esc'
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if(e.target !== modalImg) closeModal(); });
+        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
     });
 </script>
 </body>
