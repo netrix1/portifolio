@@ -8,189 +8,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="img/favicon.png" rel="icon" />
     <style>
-        /* Estilos do Tema */
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
-        .ai-gradient { background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); }
+        /* 1. CORREÇÃO DA ÂNCORA (SCROLL OFFSET) */
+        html {
+            scroll-behavior: smooth;
+            /* Isso faz o site parar 110px antes da seção, impedindo que o menu cubra o título */
+            scroll-padding-top: 110px;
+        }
 
-        /* Variáveis da Animação de Fundo */
+        /* Variáveis de Cores */
         :root {
-            --color-bg1: rgb(8, 10, 35);
-            --color-bg2: rgb(0, 17, 82);
-            --color1: 18, 113, 255;
-            --color2: 107, 74, 255;
-            --color3: 100, 220, 255;
-            --color4: 200, 50, 50;
-            --color5: 180, 180, 50;
-            --color-interactive: 140, 100, 255;
-            --circle-size: 80%;
-            --blending: hard-light;
+            --color-bg1: rgb(8, 10, 35); --color-bg2: rgb(0, 17, 82);
+            --color1: 18, 113, 255; --color2: 107, 74, 255;
+            --color-interactive: 140, 100, 255; --circle-size: 80%;
         }
 
-        /* Keyframes das Bolhas */
-        @keyframes moveInCircle {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes moveVertical {
-            0% { transform: translateY(-50%); }
-            50% { transform: translateY(50%); }
-            100% { transform: translateY(-50%); }
-        }
-        @keyframes moveHorizontal {
-            0% { transform: translateX(-50%) translateY(-10%); }
-            50% { transform: translateX(50%) translateY(10%); }
-            100% { transform: translateX(-50%) translateY(-10%); }
-        }
-
-        /* Container do Background Animado */
-        .gradient-bg {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            overflow: hidden;
-            background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
-
-        .gradient-bg svg { display: none; }
-
-        .gradients-container {
-            filter: url(#goo) blur(40px);
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Configuração das Bolhas Individuais */
-        .g1, .g2, .g3, .g4, .g5, .interactive {
-            position: absolute;
-            mix-blend-mode: var(--blending);
-            width: var(--circle-size);
-            height: var(--circle-size);
-            opacity: 1;
-        }
-
-        .g1 {
-            background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%) no-repeat;
-            top: calc(50% - var(--circle-size) / 2);
-            left: calc(50% - var(--circle-size) / 2);
-            animation: moveVertical 30s ease infinite;
-        }
-
-        .g2 {
-            background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%) no-repeat;
-            top: calc(50% - var(--circle-size) / 2);
-            left: calc(50% - var(--circle-size) / 2);
-            transform-origin: calc(50% - 400px);
-            animation: moveInCircle 20s reverse infinite;
-        }
-
-        .g3 {
-            background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%) no-repeat;
-            top: calc(50% - var(--circle-size) / 2 + 200px);
-            left: calc(50% - var(--circle-size) / 2 - 500px);
-            transform-origin: calc(50% + 400px);
-            animation: moveInCircle 40s linear infinite;
-        }
-
-        .g4 {
-            background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
-            top: calc(50% - var(--circle-size) / 2);
-            left: calc(50% - var(--circle-size) / 2);
-            transform-origin: calc(50% - 200px);
-            animation: moveHorizontal 40s ease infinite;
-            opacity: 0.7;
-        }
-
-        .g5 {
-            background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%) no-repeat;
-            width: calc(var(--circle-size) * 2);
-            height: calc(var(--circle-size) * 2);
-            top: calc(50% - var(--circle-size));
-            left: calc(50% - var(--circle-size));
-            transform-origin: calc(50% - 800px) calc(50% + 200px);
-            animation: moveInCircle 20s ease infinite;
-        }
-
-        .interactive {
-            background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%) no-repeat;
-            width: 100%;
-            height: 100%;
-            top: -50%;
-            left: -50%;
-            opacity: 0.7;
-        }
-
-        /* O Dock principal com efeito de Refração */
+        /* DOCK (MENU) */
         .liquid-dock {
-            background: rgba(15, 23, 42, 0.5); /* Fundo Navy profundo translúcido */
-            backdrop-filter: blur(25px) saturate(200%); /* Refração profunda */
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-
-            /* Borda de Vidro - Brilho na aresta superior */
-            border: 1.5px solid rgba(255, 255, 255, 0.1);
-
-            /* Sombras Internas para Profundidade (O segredo do CodePen) */
-            box-shadow:
-                    inset 0 1px 1px rgba(255, 255, 255, 0.1), /* Brilho interno no topo */
-                    0 20px 50px rgba(0, 0, 0, 0.5); /* Sombra externa pesada */
-
+            background: rgba(10, 15, 30, 0.2);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 9999px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            position: fixed; z-index: 100;
         }
 
-        /* A "Bolha" Líquida que se move */
+        /* BOLHA ANIMADA (CORRIGIDA) */
         #nav-blob {
-            /* POSICIONAMENTO E TAMANHO */
             position: absolute;
             top: 0;
             left: 0;
-            height: 100%; /* ESSENCIAL: Garante que a bolha tenha a altura do menu */
+            height: 100%; /* Garante altura total */
             z-index: 0;
             pointer-events: none;
             border-radius: 9999px;
 
-            /* VISUAL LIQUID GLASS (Mantendo o estilo aprovado) */
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
-                    inset 0 0 20px rgba(255, 255, 255, 0.1),
-                    0 0 15px rgba(255, 255, 255, 0.1);
-
-            /* FILTROS */
+            /* Filtros */
             filter: url(#liquid-filter);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
 
-            /* ANIMAÇÃO OTIMIZADA (Width + Transform) */
-            transition:
-                    width 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-                    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            /* Cores e Volume */
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1), 0 0 15px rgba(255, 255, 255, 0.1);
+
+            /* A ANIMAÇÃO ELÁSTICA ESTÁ AQUI */
+            /* 'all' garante que tanto a largura (width) quanto o movimento (transform) sejam animados */
+            /* O cubic-bezier(0.34, 1.56, 0.64, 1) cria o efeito de "mola" que passa um pouco e volta */
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 
             will-change: width, transform;
         }
 
+        /* LINKS */
         .nav-link {
-            position: relative;
-            z-index: 10;
-            padding: 0.8rem 1.5rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.15em;
-            transition: color 0.3s ease;
+            position: relative; z-index: 10; padding: 12px 24px;
+            color: rgba(255, 255, 255, 0.6); font-size: 11px;
+            font-weight: 700; letter-spacing: 0.1em; transition: color 0.3s; text-transform: uppercase;
         }
+        .nav-link.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
 
-        .nav-link.active {
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Correção Titulo em baixo do menu quando clica na ancora */
-        section {
-            scroll-margin-top: 50px;
-        }
+        /* Fundo Animado (Mantido igual) */
+        .gradient-bg { position: absolute; width: 100%; height: 100%; overflow: hidden; background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2)); top: 0; left: 0; z-index: 0; }
+        .gradients-container { filter: url(#goo) blur(40px); width: 100%; height: 100%; }
+        .g1 { position: absolute; background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%) no-repeat; width: var(--circle-size); height: var(--circle-size); animation: moveVertical 30s ease infinite; }
+        .interactive { position: absolute; background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%) no-repeat; width: 100%; height: 100%; top: -50%; left: -50%; opacity: 0.7; }
+        @keyframes moveVertical { 0% { transform: translateY(-50%); } 50% { transform: translateY(50%); } 100% { transform: translateY(-50%); } }
+        .ai-gradient { background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-300 font-sans leading-relaxed">
