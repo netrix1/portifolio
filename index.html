@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,13 +33,28 @@
 
         /* DOCK (MENU) */
         .liquid-dock {
-            background: rgba(10, 15, 30, 0.2);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(255, 255, 255, 0.02);
+            /* backdrop-filter será controlado pelo Three.js/CSS */
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 9999px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            position: fixed; z-index: 100;
+            border-radius: 40px;
+            /* Reduzi um pouco para combinar com o shader */
+            box-shadow:
+                0 40px 80px rgba(0, 0, 0, 0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+            position: fixed;
+            z-index: 100;
+            backdrop-filter: blur(10px) url(#glass-distortion);
+            -webkit-backdrop-filter: blur(10px) url(#glass-distortion);
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 90;
+            /* Abaixo do menu (100) mas acima do fundo (0) */
+            pointer-events: none;
         }
 
         /* BOLHA ANIMADA (CORRIGIDA) */
@@ -46,7 +62,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            height: 100%; /* Garante altura total */
+            height: 100%;
+            /* Garante altura total */
             z-index: 0;
             pointer-events: none;
             border-radius: 9999px;
@@ -71,27 +88,63 @@
 
         /* LINKS */
         .nav-link {
-            position: relative; z-index: 10; padding: 12px 24px;
-            color: rgba(255, 255, 255, 0.6); font-size: 11px;
-            font-weight: 700; letter-spacing: 0.1em; transition: color 0.3s; text-transform: uppercase;
+            position: relative;
+            z-index: 10;
+            padding: 12px 24px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+            text-transform: uppercase;
         }
-        .nav-link.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
+
+        .nav-link.active {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
 
         /* Keyframes das Bolhas */
         @keyframes moveInCircle {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(180deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         @keyframes moveVertical {
-            0% { transform: translateY(-50%); }
-            50% { transform: translateY(50%); }
-            100% { transform: translateY(-50%); }
+            0% {
+                transform: translateY(-50%);
+            }
+
+            50% {
+                transform: translateY(50%);
+            }
+
+            100% {
+                transform: translateY(-50%);
+            }
         }
+
         @keyframes moveHorizontal {
-            0% { transform: translateX(-50%) translateY(-10%); }
-            50% { transform: translateX(50%) translateY(10%); }
-            100% { transform: translateX(-50%) translateY(-10%); }
+            0% {
+                transform: translateX(-50%) translateY(-10%);
+            }
+
+            50% {
+                transform: translateX(50%) translateY(10%);
+            }
+
+            100% {
+                transform: translateX(-50%) translateY(-10%);
+            }
         }
 
         /* Container do Background Animado */
@@ -106,15 +159,23 @@
             z-index: 0;
         }
 
-        .gradient-bg svg { display: none; }
+        .gradient-bg svg {
+            display: none;
+        }
 
         .gradients-container {
             filter: url(#goo) blur(40px);
             width: 100%;
             height: 100%;
         }
+
         /* Configuração das Bolhas Individuais */
-        .g1, .g2, .g3, .g4, .g5, .interactive {
+        .g1,
+        .g2,
+        .g3,
+        .g4,
+        .g5,
+        .interactive {
             position: absolute;
             mix-blend-mode: var(--blending);
             width: var(--circle-size);
@@ -172,548 +233,893 @@
             left: -50%;
             opacity: 0.7;
         }
-        @keyframes moveVertical { 0% { transform: translateY(-50%); } 50% { transform: translateY(50%); } 100% { transform: translateY(-50%); } }
-        .ai-gradient { background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); }
-    </style>
-</head>
-<body class="bg-[#020617] text-slate-300 font-sans leading-relaxed">
 
-<nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-6xl liquid-dock px-8 py-4 hidden md:flex items-center justify-between shadow-2xl">
-    <span class="text-xl font-black tracking-tighter text-white">
-        EVERSON<span class="text-indigo-500">.</span>SANTANA
-    </span>
+        @keyframes moveVertical {
+            0% {
+                transform: translateY(-50%);
+            }
 
-    <div id="nav-links-container" class="relative flex items-center space-x-2 text-[10px] font-bold uppercase tracking-[0.2em]">
-        <div id="nav-blob" class="absolute bg-white/10 rounded-full transition-all duration-400 ease-out pointer-events-none z-0"></div>
+            50% {
+                transform: translateY(50%);
+            }
 
-        <a href="#home" class="nav-link relative z-10 px-4 py-2 text-white transition-colors" data-section="home">Início</a>
-        <a href="#about" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors" data-section="about">Resumo</a>
-        <a href="#skills" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors" data-section="skills">Skills</a>
-        <a href="#projects" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors" data-section="projects">Projetos</a>
-        <a href="#experience" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors" data-section="experience">Exp</a>
-        <a href="#about-more" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors" data-section="about-more">Mais</a>
-    </div>
-</nav>
-
-<nav class="fixed w-full z-50 glass border-b border-slate-800 md:hidden h-16 flex items-center justify-between px-6">
-    <span class="text-xl font-black tracking-tighter text-white">
-        EVERSON<span class="text-indigo-500">.</span>SANTANA
-    </span>
-    <i class="fas fa-bars text-white"></i>
-</nav>
-
-<section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-40">
-
-    <div class="gradient-bg">
-        <svg xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <filter id="goo">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-                    <feBlend in="SourceGraphic" in2="goo" />
-                </filter>
-            </defs>
-        </svg>
-        <div class="gradients-container">
-            <div class="g1"></div>
-            <div class="g2"></div>
-            <div class="g3"></div>
-            <div class="g4"></div>
-            <div class="g5"></div>
-            <div class="interactive"></div>
-        </div>
-    </div>
-
-    <div class="relative z-10 max-w-5xl mx-auto text-center px-6">
-        <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
-            Desenvolvedor Full Stack & <br>
-            <span class="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent italic text-4xl md:text-6xl">
-                IA Aplicada
-            </span>
-        </h1>
-        <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
-            PHP, Python, Agentes de IA e DevOps. Especialista em modernização de sistemas e automação inteligente.
-        </p>
-
-        <div class="flex flex-col md:flex-row justify-center items-center gap-4">
-            <a href="#projects" class="w-full md:w-auto ai-gradient text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition shadow-lg text-sm uppercase tracking-wider">
-                <i class="fas fa-rocket mr-2"></i> Ver Projetos
-            </a>
-
-            <a href="https://github.com/netrix1" target="_blank" class="w-full md:w-auto bg-slate-900/80 backdrop-blur-md text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition border border-slate-700 text-sm uppercase tracking-wider">
-                <i class="fab fa-github mr-2"></i> GitHub
-            </a>
-
-            <a href="https://codepen.io/everson-luiz-santana/pens/public" target="_blank" class="w-full md:w-auto bg-slate-900/80 backdrop-blur-md text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition border border-slate-700 text-sm uppercase tracking-wider">
-                <i class="fa-brands fa-codepen mr-2"></i> CodePen
-            </a>
-        </div>
-    </div>
-</section>
-
-<section id="about" class="py-20 bg-slate-900/30">
-    <div class="max-w-4xl mx-auto px-6">
-        <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-4">
-            <img src="img/Everson.png"
-                 alt="Everson foto"
-                 class="w-[70px] h-[70px] rounded-full object-cover border-2 border-indigo-500 shadow-md">
-            Resumo Profissional
-        </h2>
-        <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 italic text-slate-400 leading-relaxed">
-            "Desenvolvedor Full Stack com sólida experiência em modernização de sistemas legados, DevOps e engenharia de IA aplicada. Atuação recente com Python, agentes de IA, automação inteligente e pipelines de processamento, integrando modelos de linguagem (LLMs) a sistemas existentes. Forte background em PHP 7/8, Laravel, CodeIgniter, Docker e bancos relacionais, com foco em arquitetura, segurança, observabilidade e soluções escaláveis. Experiência prática na construção de fluxos de IA para OCR, classificação, transformação de dados e automação de processos."
-        </div>
-    </div>
-</section>
-
-<section id="skills" class="py-20 px-6">
-    <div class="max-w-7xl mx-auto">
-        <h2 class="text-2xl font-bold text-white mb-12 text-center uppercase tracking-widest">Stack Tecnológica</h2>
-
-        <div class="grid md:grid-cols-3 gap-6">
-
-            <div class="p-8 bg-slate-900 rounded-3xl border border-slate-800 hover:border-indigo-500 transition-all duration-300 shadow-2xl">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i class="fab fa-python text-blue-400"></i> Inteligência Artificial
-                </h3>
-                <ul class="space-y-3 text-sm text-slate-400 font-medium">
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> Agentes de IA (Multi-agente e Orquestração)</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> Integração com LLMs (OpenAI / APIs)</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> Python 3 (FastAPI, Pipelines de Automação)</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> OCR e Processamento Semântico de Texto</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> CrewAi, n8n, Ollama e DeepSeek</li>
-                </ul>
-            </div>
-
-            <div class="p-8 bg-slate-900 rounded-3xl border border-slate-800 hover:border-emerald-500 transition-all duration-300 shadow-2xl">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-laptop-code text-emerald-400"></i> Frontend
-                </h3>
-                <ul class="space-y-3 text-sm text-slate-400 font-medium">
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> React 18 & TypeScript</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> JavaScript Moderno (ES6+)</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> Tailwind CSS & Bootstrap 5</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> UI/UX: Design Responsivo e Acessibilidade</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> Componentização e Integração com APIs</li>
-                </ul>
-            </div>
-
-            <div class="p-8 bg-slate-900 rounded-3xl border border-slate-800 hover:border-cyan-500 transition-all duration-300 shadow-2xl">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-server text-cyan-400"></i> Back-end & DevOps
-                </h3>
-                <ul class="space-y-3 text-sm text-slate-400 font-medium">
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> PHP 8.x, Laravel e CodeIgniter</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> Modernização de Sistemas Legados</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> Docker & Builds Reprodutíveis</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> MySQL, SQL Server e Informix</li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> Segurança OWASP e Mitigação de CVEs</li>
-                </ul>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<section id="projects" class="py-20 px-6 bg-slate-900/20">
-    <div class="max-w-6xl mx-auto">
-        <h2 class="text-3xl font-bold text-white mb-16 text-center italic">Portfolio de Projetos</h2>
-
-        <div class="space-y-16">
-            <div class="grid md:grid-cols-2 gap-8 items-center border-b border-slate-800 pb-16">
-                <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
-                    <img src="img/MojiTranslate.png" alt="MojiTranslateAI Screenshot" class="w-full h-full object-cover">
-                </div>
-                <div>
-                    <div class="inline-block px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-bold mb-4 uppercase tracking-widest italic">Projeto de IA Aplicada</div>
-                    <h3 class="text-2xl font-bold text-white mb-4 italic">MojiTranslateAI</h3>
-                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                        Pipeline de IA para tradução automática de Mangás. Automatiza detecção, OCR, tradução e diagramação.
-                    </p>
-                    <ul class="text-xs text-slate-500 space-y-2 mb-6">
-                        <li>• Desenvolvimento de pipelines em Python para processamento automatizado.</li>
-                        <li>• Arquitetura baseada em agentes de IA (OCR, validação, enriquecimento).</li>
-                        <li>• Integração de LLMs para análise semântica e correção.</li>
-                        <li>• Execução local e containerizada.</li>
-                    </ul>
-                    <a href="https://github.com/netrix1/MojiTranslateAI" target="_blank" class="text-white bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-lg transition text-sm inline-flex items-center gap-2">
-                        <i class="fab fa-github"></i> Ver Repositório
-                    </a>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 items-center border-b border-slate-800 pb-16">
-                <div class="md:order-2 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
-                    <img src="img/ResumeMe.png" alt="ResumeMe Screenshot" class="w-full h-full object-cover">
-                </div>
-                <div class="md:order-1">
-                    <div class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-4 uppercase tracking-widest italic">Projeto de IA Aplicada</div>
-                    <h3 class="text-2xl font-bold text-white mb-4 italic">ResumeMe</h3>
-                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                        IA especialista em capturar dados de candidatos a partir de fotos ou documentos (PDF/Docx).
-                    </p>
-                    <ul class="text-xs text-slate-500 space-y-2 mb-6">
-                        <li>• Implementação de arquitetura baseada em agentes inteligentes.</li>
-                        <li>• Construção de APIs REST com FastAPI para consumo externo.</li>
-                        <li>• Organização de dados em estruturas versionadas (JSON).</li>
-                    </ul>
-                    <span class="text-slate-600 text-xs uppercase italic font-bold tracking-widest">Projeto Interno</span>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 items-center border-b border-slate-800 pb-16">
-                <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
-                    <img src="img/TemploDesk.png" alt="Templodesk Screenshot" class="w-full h-full object-cover">
-                </div>
-                <div>
-                    <div class="inline-block px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold mb-4 uppercase tracking-widest italic">Portal Completo</div>
-                    <h3 class="text-2xl font-bold text-white mb-4 italic">TemploDesk</h3>
-                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                        Sistema de gestão para igrejas de pequeno e médio porte. Desenvolvido em Laravel com foco em escalabilidade.
-                    </p>
-                    <a href="http://templodesk.com/" target="_blank" class="text-white bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-lg transition text-sm inline-flex items-center gap-2">
-                        <i class="fas fa-external-link-alt"></i> templodesk.com
-                    </a>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div class="md:order-2 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
-                    <img src="img/LyScreen.png" alt="Youtube-Lyrics Screenshot" class="w-full h-full object-cover">
-                </div>
-                <div class="md:order-1">
-                    <div class="inline-block px-3 py-1 rounded-full bg-slate-500/10 text-slate-400 text-xs font-bold mb-4 uppercase tracking-widest italic"><i class="fa-solid fa-pen-ruler"></i> WiP</div>
-                    <h3 class="text-2xl font-bold text-white mb-4 italic">LyScreen</h3>
-                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                        Sistema de projeção de letras sincronizadas diretamente com a plataforma do YouTube.
-                    </p>
-                    <ul class="text-xs text-slate-500 space-y-2 mb-6">
-                        <li>• Backend desenvolvido em Python e front em node.js.</li>
-                        <li>• Sistema roda em desktop usando electron.</li>
-                        <li>• Todas as interações entre back e frontend se dão via WebSocket.</li>
-                    </ul>
-                    <a href="https://youtu.be/cMLaeadmMjY" target="_blank" class="text-white bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-lg transition text-sm inline-flex items-center gap-2">
-                        <i class="fa-brands fa-youtube"></i> Veja o vídeo do projeto
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="experience" class="py-20 px-6 bg-slate-950">
-    <div class="max-w-5xl mx-auto">
-        <h2 class="text-3xl font-bold text-white mb-20 text-center italic">Experiência Profissional</h2>
-
-        <div class="relative ml-8 md:ml-44">
-
-            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-[linear-gradient(to_bottom,#6366f1,#8b5cf6,#465366,#020617)]"></div>
-
-            <div class="mb-24 relative min-h-[100px]">
-
-                <div class="ml-10">
-                    <img src="img/logo-pdcase.png"
-                         alt="PD Case"
-                         class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
-
-                    <div class="absolute -left-[7px] top-2 w-4 h-4 bg-indigo-500 rounded-full border-4 border-slate-950 shadow-[0_0_15px_#6366f1] z-10"></div>
-
-                    <div class="flex flex-col mb-1">
-                        <h3 class="text-xl font-bold text-white leading-none">PD Case Informática Ltda</h3>
-                        <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">Jan/2023 – Atual</p>
-                    </div>
-                    <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Desenvolvedor PHP Pleno (Remoto)</p>
-                    <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
-                        <li>• Modernização de sistemas legados (PHP 5.x para 8.x) e mitigação de riscos OWASP.</li>
-                        <li>• Padronização de Dockerfiles e infraestrutura containerizada para builds reprodutíveis.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mb-24 relative min-h-[100px]">
-                <div class="ml-10">
-                    <img src="img/logo-peoplenect.png"
-                         alt="Peoplenect"
-                         class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
-
-                    <div class="absolute -left-[7px] top-2 w-4 h-4 bg-[#895cf3] rounded-full border-4 border-slate-950 z-10"></div>
-
-                    <div class="flex flex-col mb-1">
-                        <h3 class="text-xl font-bold text-white leading-none">Peoplenect</h3>
-                        <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">Mar/2019 – Atual</p>
-                    </div>
-                    <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Consultor Técnico / Dev PHP Pleno</p>
-                    <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
-                        <li>• Evolução de ATS com **Laravel + React** e migração para Bootstrap 5.</li>
-                        <li>• Implementação de camada de upload S3 e segurança de rotas MySQL.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mb-24 relative min-h-[100px]">
-                <div class="ml-10">
-                    <img src="img/logo-helpmais.png"
-                         alt="HelpMaisCredito"
-                         class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
-
-                    <div class="absolute -left-[7px] top-2 w-4 h-4 bg-[#50547a] rounded-full border-4 border-slate-950 z-10"></div>
-
-                    <div class="flex flex-col mb-1">
-                        <h3 class="text-xl font-bold text-white leading-none">HelpMaisCredito</h3>
-                        <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">Jan/2018 – Mar/2019</p>
-                    </div>
-                    <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Desenvolvedor PHP Fullstack</p>
-                    <ul class="text-slate-400 text-sm space-y-1">
-                        <li>• Desenvolvimento completo de sistemas web internos com PHP e MySQL.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="relative min-h-[100px]">
-                <div class="ml-10">
-                    <img src="img/logo-neobpo.png"
-                         alt="Neobpo"
-                         class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
-
-                    <div class="absolute -left-[7px] top-2 w-4 h-4 bg-slate-900 rounded-full border-4 border-slate-950 z-10"></div>
-
-                    <div class="flex flex-col mb-1">
-                        <h3 class="text-xl font-bold text-white leading-none">Neobpo (UOL)</h3>
-                        <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">Mar/2016 – Out/2018</p>
-                    </div>
-                    <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Analista de Suporte / Web Developer</p>
-                    <ul class="text-slate-400 text-sm space-y-1">
-                        <li>• Manutenção de intranet e suporte técnico ao portal UOL (HTML/CSS/JS).</li>
-                    </ul>
-
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<section id="about-more" class="py-20 px-6 bg-slate-900/40">
-    <div class="max-w-6xl mx-auto">
-        <h2 class="text-3xl font-bold text-white mb-16 text-center italic">Mais Sobre Mim</h2>
-
-        <div class="grid md:grid-cols-3 gap-8">
-
-            <div class="p-8 bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-indigo-500 transition shadow-xl">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-graduation-cap text-indigo-400"></i> Formação Acadêmica
-                </h3>
-                <div class="space-y-6">
-                    <div>
-                        <p class="text-indigo-400 font-bold text-sm uppercase tracking-wider">Tecnologia em Redes de Computadores</p>
-                        <p class="text-white text-sm">Universidade Cruzeiro do Sul (2016 – 2018)</p>
-                        <ul class="mt-2 text-xs text-slate-500 space-y-1">
-                            <li>• <span class="text-amber-500/80">Láurea Acadêmica</span> (Melhor aluno do curso)</li>
-                            <li>• Prêmio destaque por trabalhos sociais</li>
-                        </ul>
-                    </div>
-                    <div class="pt-4 border-t border-slate-800">
-                        <p class="text-indigo-400 font-bold text-sm uppercase tracking-wider">Técnico em Informática</p>
-                        <p class="text-white text-sm">Universidade Cidade de São Paulo (2014 – 2015)</p>
-                        <ul class="mt-2 text-xs text-slate-500 space-y-1">
-                            <li>• Representante de turma</li>
-                            <li>• Melhor média acadêmica do semestre</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-8 bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-cyan-500 transition shadow-xl">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-globe text-cyan-400"></i> Idiomas
-                </h3>
-                <div class="space-y-6">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white font-medium">Português</span>
-                        <span class="text-xs bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded">Nativo</span>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-white font-medium">Inglês</span>
-                            <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded">Básico – Intermediário</span>
-                        </div>
-                        <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2">
-                            <div class="bg-indigo-500 h-1.5 rounded-full shadow-[0_0_10px_#6366f1]" style="width: 45%"></div>
-                        </div>
-                        <p class="text-[10px] text-slate-500 italic mt-1 uppercase tracking-tighter">
-                            Duolingo Score: 72 (Jan/2026)
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-8 bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-emerald-500 transition shadow-xl">
-                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-award text-emerald-400"></i> Qualificações & Conquistas
-                </h3>
-                <ul class="space-y-4 text-sm text-slate-400">
-                    <li class="flex items-start gap-3">
-                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
-                        <span>Modernização de Legados: Refatoração de PHP 5.x para PHP 8.x com padrões PSR.</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
-                        <span>Segurança (OWASP): Revisão de fluxos de upload e mitigação de vulnerabilidades.</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
-                        <span>Containerização: Experiência em Docker para builds reprodutíveis e isolamento.</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
-                        <span>UI/UX: Migração de legados para interfaces modernas com Bootstrap 5.</span>
-                    </li>
-                </ul>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<footer class="py-12 text-center border-t border-slate-800 mt-20">
-    <p class="text-slate-500 text-xs tracking-widest uppercase">
-        Everson L. Santana — 2026 — Desenvolvedor Full Stack & IA Aplicada
-    </p>
-</footer>
-
-<div id="imageModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/95 p-4 backdrop-blur-md cursor-zoom-out">
-    <span class="absolute top-6 right-8 text-white text-5xl cursor-pointer hover:text-indigo-500 transition-all">&times;</span>
-
-    <img id="modalImage" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl border border-slate-800 transition-transform duration-300 scale-95" src="" alt="">
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const interBubble = document.querySelector('.interactive');
-        let curX = 0;
-        let curY = 0;
-        let tgX = 0;
-        let tgY = 0;
-
-        function move() {
-            curX += (tgX - curX) / 20;
-            curY += (tgY - curY) / 20;
-            interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
-            requestAnimationFrame(() => {
-                move();
-            });
+            100% {
+                transform: translateY(-50%);
+            }
         }
 
-        window.addEventListener('mousemove', (event) => {
-            tgX = event.clientX;
-            tgY = event.clientY;
+        .ai-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-[#020617] text-slate-300 font-sans leading-relaxed">
+
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Filtro SVG Otimizado para Performance -->
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+        <filter id="glass-distortion" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="1" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="20" xChannelSelector="R" yChannelSelector="G"
+                id="svg-dist-map" />
+        </filter>
+    </svg>
+
+    <nav
+        class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-6xl liquid-dock px-8 py-4 hidden md:flex items-center justify-between shadow-2xl">
+        <span class="text-xl font-black tracking-tighter text-white">
+            EVERSON<span class="text-indigo-500">.</span>SANTANA
+        </span>
+
+        <div id="nav-links-container"
+            class="relative flex items-center space-x-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+            <div id="nav-blob"
+                class="absolute bg-white/10 rounded-full transition-all duration-400 ease-out pointer-events-none z-0">
+            </div>
+
+            <a href="#home" class="nav-link relative z-10 px-4 py-2 text-white transition-colors"
+                data-section="home">Início</a>
+            <a href="#about" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                data-section="about">Resumo</a>
+            <a href="#skills" class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                data-section="skills">Skills</a>
+            <a href="#projects"
+                class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                data-section="projects">Projetos</a>
+            <a href="#experience"
+                class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                data-section="experience">Exp</a>
+            <a href="#about-more"
+                class="nav-link relative z-10 px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                data-section="about-more">Mais</a>
+        </div>
+    </nav>
+
+    <nav
+        class="fixed w-full z-50 glass border-b border-slate-800 md:hidden h-16 flex items-center justify-between px-6">
+        <span class="text-xl font-black tracking-tighter text-white">
+            EVERSON<span class="text-indigo-500">.</span>SANTANA
+        </span>
+        <i class="fas fa-bars text-white"></i>
+    </nav>
+
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-40">
+
+        <div class="gradient-bg">
+            <svg xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="goo">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+                            result="goo" />
+                        <feBlend in="SourceGraphic" in2="goo" />
+                    </filter>
+                </defs>
+            </svg>
+            <div class="gradients-container">
+                <div class="g1"></div>
+                <div class="g2"></div>
+                <div class="g3"></div>
+                <div class="g4"></div>
+                <div class="g5"></div>
+                <div class="interactive"></div>
+            </div>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto text-center px-6">
+            <h1 class="text-5xl md:text-5xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
+                Desenvolvedor Full Stack com atuação<br>
+                em automação inteligente e<br>
+                <span
+                    class="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent italic text-4xl md:text-6xl">
+                    IA Aplicada
+                </span>
+            </h1>
+            <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
+                Python, Agentes de IA e DevOps. Especialista em modernização de sistemas e automação inteligente.
+            </p>
+
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <a href="#projects"
+                    class="w-full md:w-auto ai-gradient text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition shadow-lg text-sm uppercase tracking-wider">
+                    <i class="fas fa-rocket mr-2"></i> Ver Projetos
+                </a>
+
+                <a href="https://github.com/netrix1" target="_blank"
+                    class="w-full md:w-auto bg-slate-900/80 backdrop-blur-md text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition border border-slate-700 text-sm uppercase tracking-wider">
+                    <i class="fab fa-github mr-2"></i> GitHub
+                </a>
+
+                <a href="https://codepen.io/everson-luiz-santana/pens/public" target="_blank"
+                    class="w-full md:w-auto bg-slate-900/80 backdrop-blur-md text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition border border-slate-700 text-sm uppercase tracking-wider">
+                    <i class="fa-brands fa-codepen mr-2"></i> CodePen
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 bg-slate-900/30">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-4">
+                <img src="img/Everson.png" alt="Everson foto"
+                    class="w-[70px] h-[70px] rounded-full object-cover border-2 border-indigo-500 shadow-md">
+                Resumo Profissional
+            </h2>
+            <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 italic text-slate-400 leading-relaxed">
+                "Desenvolvedor Full Stack com sólida experiência em modernização de sistemas legados, DevOps e
+                implementação de soluções com IA aplicada. Atuação recente com Python, agentes de IA, automação inteligente e pipelines
+                de processamento de dados e automações com Python, integrando modelos de linguagem (LLMs) a sistemas existentes. Forte background em PHP
+                7/8, Laravel, CodeIgniter, Docker e bancos relacionais, com foco em arquitetura, segurança,
+                observabilidade e soluções escaláveis. Experiência prática na construção de fluxos de IA para OCR,
+                classificação, transformação de dados e automação de processos."
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-12 text-center uppercase tracking-widest">Stack Tecnológica</h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+
+                <div
+                    class="p-8 bg-slate-900 rounded-3xl border border-slate-800 hover:border-indigo-500 transition-all duration-300 shadow-2xl">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fab fa-python text-blue-400"></i> Inteligência Artificial
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-400 font-medium">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> Agentes de
+                            IA (Multi-agente e Orquestração)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> Integração
+                            com LLMs (OpenAI / APIs)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> Python 3
+                            (FastAPI, Pipelines de Automação)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> OCR e
+                            Processamento Semântico de Texto</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-indigo-500 mt-1"></i> CrewAi,
+                            n8n, Ollama e DeepSeek</li>
+                    </ul>
+                </div>
+
+                <div
+                    class="p-8 bg-slate-900 rounded-3xl border border-slate-800 hover:border-emerald-500 transition-all duration-300 shadow-2xl">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fas fa-laptop-code text-emerald-400"></i> Frontend
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-400 font-medium">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> React 18 &
+                            TypeScript</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> JavaScript
+                            Moderno (ES6+)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> Tailwind
+                            CSS & Bootstrap 5</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i> UI/UX:
+                            Design Responsivo e Acessibilidade</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1"></i>
+                            Componentização e Integração com APIs</li>
+                    </ul>
+                </div>
+
+                <div
+                    class="p-8 bg-slate-900 rounded-3xl border border-slate-800 hover:border-cyan-500 transition-all duration-300 shadow-2xl">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fas fa-server text-cyan-400"></i> Back-end & DevOps
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-400 font-medium">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> PHP 8.x,
+                            Laravel e CodeIgniter</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> Modernização
+                            de Sistemas Legados</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> Docker &
+                            Builds Reprodutíveis</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> MySQL, SQL
+                            Server e Informix</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-cyan-500 mt-1"></i> Segurança
+                            OWASP e Mitigação de CVEs</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-20 px-6 bg-slate-900/20">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-16 text-center italic">Portfolio de Projetos</h2>
+
+            <div class="space-y-16">
+                <div class="grid md:grid-cols-2 gap-8 items-center border-b border-slate-800 pb-16">
+                    <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+                        <img src="img/MojiTranslate.png" alt="MojiTranslateAI Screenshot"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <div
+                            class="inline-block px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-bold mb-4 uppercase tracking-widest italic">
+                            Projeto de IA Aplicada</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 italic">MojiTranslateAI</h3>
+                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                            Pipeline de IA para tradução automática de Mangás. Automatiza detecção, OCR, tradução e
+                            diagramação.
+                        </p>
+                        <ul class="text-xs text-slate-500 space-y-2 mb-6">
+                            <li>• Desenvolvimento de pipelines em Python para processamento automatizado.</li>
+                            <li>• Arquitetura baseada em agentes de IA (OCR, validação, enriquecimento).</li>
+                            <li>• Integração de LLMs para análise semântica e correção.</li>
+                            <li>• Execução local e containerizada.</li>
+                        </ul>
+                        <a href="https://github.com/netrix1/MojiTranslateAI" target="_blank"
+                            class="text-white bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-lg transition text-sm inline-flex items-center gap-2">
+                            <i class="fab fa-github"></i> Ver Repositório
+                        </a>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center border-b border-slate-800 pb-16">
+                    <div class="md:order-2 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+                        <img src="img/ResumeMe.png" alt="ResumeMe Screenshot" class="w-full h-full object-cover">
+                    </div>
+                    <div class="md:order-1">
+                        <div
+                            class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-4 uppercase tracking-widest italic">
+                            Projeto de IA Aplicada</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 italic">ResumeMe</h3>
+                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                            Projeto de IA para extração automatizada de dados de documentos "Currículos". (PDF/Docx).
+                        </p>
+                        <ul class="text-xs text-slate-500 space-y-2 mb-6">
+                            <li>• Implementação de arquitetura baseada em agentes inteligentes.</li>
+                            <li>• Construção de APIs REST com FastAPI para consumo externo.</li>
+                            <li>• Organização de dados em estruturas versionadas (JSON).</li>
+                        </ul>
+                        <span class="text-slate-600 text-xs uppercase italic font-bold tracking-widest">Projeto
+                            Interno</span>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center border-b border-slate-800 pb-16">
+                    <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+                        <img src="img/TemploDesk.png" alt="Templodesk Screenshot" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <div
+                            class="inline-block px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold mb-4 uppercase tracking-widest italic">
+                            Portal Completo</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 italic">TemploDesk</h3>
+                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                            Sistema de gestão para igrejas de pequeno e médio porte. Desenvolvido em Laravel com foco em
+                            escalabilidade.
+                        </p>
+                        <a href="http://templodesk.com/" target="_blank"
+                            class="text-white bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-lg transition text-sm inline-flex items-center gap-2">
+                            <i class="fas fa-external-link-alt"></i> templodesk.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="md:order-2 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+                        <img src="img/LyScreen.png" alt="Youtube-Lyrics Screenshot" class="w-full h-full object-cover">
+                    </div>
+                    <div class="md:order-1">
+                        <div
+                            class="inline-block px-3 py-1 rounded-full bg-slate-500/10 text-slate-400 text-xs font-bold mb-4 uppercase tracking-widest italic">
+                            <i class="fa-solid fa-pen-ruler"></i> WiP
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4 italic">LyScreen</h3>
+                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                            Sistema de projeção de letras sincronizadas diretamente com a plataforma do YouTube.
+                        </p>
+                        <ul class="text-xs text-slate-500 space-y-2 mb-6">
+                            <li>• Backend desenvolvido em Python e front em node.js.</li>
+                            <li>• Sistema roda em desktop usando electron.</li>
+                            <li>• Todas as interações entre back e frontend se dão via WebSocket.</li>
+                        </ul>
+                        <a href="https://youtu.be/cMLaeadmMjY" target="_blank"
+                            class="text-white bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-lg transition text-sm inline-flex items-center gap-2">
+                            <i class="fa-brands fa-youtube"></i> Veja o vídeo do projeto
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-20 px-6 bg-slate-950">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-20 text-center italic">Experiência Profissional</h2>
+
+            <div class="relative ml-8 md:ml-44">
+                <div
+                        class="absolute left-0 top-0 bottom-0 w-[2px] bg-[linear-gradient(to_bottom,#6366f1,#8b5cf6,#465366,#020617)]">
+                </div>
+
+                <!-- PD Case -->
+                <div class="mb-24 relative min-h-[100px]">
+                    <div class="ml-10">
+                        <img src="img/logo-pdcase.png" alt="PD Case"
+                             class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
+
+                        <div
+                                class="absolute -left-[7px] top-2 w-4 h-4 bg-indigo-500 rounded-full border-4 border-slate-950 shadow-[0_0_15px_#6366f1] z-10">
+                        </div>
+
+                        <div class="flex flex-col mb-1">
+                            <h3 class="text-xl font-bold text-white leading-none">PD Case Informática Ltda</h3>
+                            <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">
+                                Jan/2023 – Atual
+                            </p>
+                        </div>
+
+                        <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Desenvolvedor Pleno (Remoto)</p>
+
+                        <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
+                            <li>• Desenvolvimento de fluxos automatizados de processamento de dados, incluindo validação, transformação e organização de informações.</li>
+                            <li>• Modernização de sistemas legados (PHP 5/7 → PHP 8), com foco em segurança, padronização e sustentabilidade do código (boas práticas OWASP).</li>
+                            <li>• Apoio à adoção de soluções de IA aplicada, utilizando agentes para automação de tarefas e integração com sistemas existentes.</li>
+                            <li>• Padronização de Dockerfiles e infraestrutura containerizada para builds reprodutíveis; atualização de dependências.</li>
+                            <li>• Integrações com MySQL, SQL Server (ODBC 18) e Informix; reforço em fluxos de upload (MIME, limites e mensagens).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Peoplenect (Freelance) -->
+                <div class="mb-24 relative min-h-[100px]">
+                    <div class="ml-10">
+                        <img src="img/logo-peoplenect.png" alt="Peoplenect"
+                             class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
+
+                        <div
+                                class="absolute -left-[7px] top-2 w-4 h-4 bg-[#895cf3] rounded-full border-4 border-slate-950 z-10">
+                        </div>
+
+                        <div class="flex flex-col mb-1">
+                            <h3 class="text-xl font-bold text-white leading-none">Peoplenect</h3>
+                            <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">
+                                Out/2022 – Atual (Consultoria e freelance paralelos a outras funções)
+                            </p>
+                        </div>
+
+                        <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Consultor Técnico (Remoto)</p>
+
+                        <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
+                            <li>• Criação e evolução de infraestrutura para processamento automatizado de dados de candidatos, apoiando fluxos de triagem e organização de informações.</li>
+                            <li>• Implementação de rotinas de automação e apoio a iniciativas de IA aplicada em processos internos.</li>
+                            <li>• Evolução de ATS com correções técnicas e ajustes de paginação/ordenação seguras (MySQL).</li>
+                            <li>• Migração e modernização de telas para Bootstrap 5, com melhorias de usabilidade.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Peoplenect (CLT/Pleno) -->
+                <div class="mb-24 relative min-h-[100px]">
+                    <div class="ml-10">
+                        <img src="img/logo-peoplenect.png" alt="Peoplenect"
+                             class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
+
+                        <div
+                                class="absolute -left-[7px] top-2 w-4 h-4 bg-[#7c3aed] rounded-full border-4 border-slate-950 z-10">
+                        </div>
+
+                        <div class="flex flex-col mb-1">
+                            <h3 class="text-xl font-bold text-white leading-none">Peoplenect</h3>
+                            <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">
+                                Mar/2019 – Out/2022 (Híbrido)
+                            </p>
+                        </div>
+
+                        <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Desenvolvedor de Software (Pleno)</p>
+
+                        <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
+                            <li>• Manutenção evolutiva de sistemas legados em PHP e MySQL, com entrega contínua de funcionalidades e correções.</li>
+                            <li>• Projeto greenfield com Laravel e React, transpondo regras de negócio do legado para arquitetura moderna.</li>
+                            <li>• Desenvolvimento e integração de APIs internas, com foco em organização, documentação e reutilização de componentes.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- HelpMaisCredito -->
+                <div class="mb-24 relative min-h-[100px]">
+                    <div class="ml-10">
+                        <img src="img/logo-helpmais.png" alt="HelpMaisCredito"
+                             class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
+
+                        <div
+                                class="absolute -left-[7px] top-2 w-4 h-4 bg-[#50547a] rounded-full border-4 border-slate-950 z-10">
+                        </div>
+
+                        <div class="flex flex-col mb-1">
+                            <h3 class="text-xl font-bold text-white leading-none">HelpMaisCredito</h3>
+                            <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">
+                                Jan/2018 – Mar/2019
+                            </p>
+                        </div>
+
+                        <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Desenvolvedor Full Stack</p>
+
+                        <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
+                            <li>• Desenvolvimento e manutenção de sistemas web internos (PHP, MySQL, HTML, CSS e JavaScript).</li>
+                            <li>• Atuação transversal entre back-end, front-end e suporte técnico, apoiando áreas internas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Neobpo -->
+                <div class="relative min-h-[100px]">
+                    <div class="ml-10">
+                        <img src="img/logo-neobpo.png" alt="Neobpo"
+                             class="relative md:absolute block md:-left-[145px] md:top-0 w-[130px] h-14 mb-4 md:mb-0 rounded-xl border border-slate-800 object-contain grayscale hover:grayscale-0 transition-all duration-300 shadow-lg bg-slate-900/40 p-2">
+
+                        <div
+                                class="absolute -left-[7px] top-2 w-4 h-4 bg-slate-900 rounded-full border-4 border-slate-950 z-10">
+                        </div>
+
+                        <div class="flex flex-col mb-1">
+                            <h3 class="text-xl font-bold text-white leading-none">Neobpo (UOL)</h3>
+                            <p class="text-indigo-400 text-[10px] font-mono tracking-widest uppercase font-bold mt-2 text-xs">
+                                Mar/2016 – Out/2017
+                            </p>
+                        </div>
+
+                        <p class="text-indigo-500 font-semibold mb-3 italic text-sm">Analista de Suporte / Web Developer</p>
+
+                        <ul class="text-slate-400 text-sm space-y-2 leading-relaxed">
+                            <li>• Suporte técnico ao portal e intranet do UOL; correções e ajustes em HTML, CSS, JavaScript e consultas MySQL.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <section id="about-more" class="py-20 px-6 bg-slate-900/40">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-16 text-center italic">Mais Sobre Mim</h2>
+
+            <div class="grid md:grid-cols-3 gap-8">
+
+                <div
+                    class="p-8 bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-indigo-500 transition shadow-xl">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fas fa-graduation-cap text-indigo-400"></i> Formação Acadêmica
+                    </h3>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-indigo-400 font-bold text-sm uppercase tracking-wider">Tecnologia em Redes de
+                                Computadores</p>
+                            <p class="text-white text-sm">Universidade Cruzeiro do Sul (2016 – 2018)</p>
+                            <ul class="mt-2 text-xs text-slate-500 space-y-1">
+                                <li>• <span class="text-amber-500/80">Láurea Acadêmica</span> (Melhor aluno do curso)
+                                </li>
+                                <li>• Prêmio destaque por trabalhos sociais</li>
+                            </ul>
+                        </div>
+                        <div class="pt-4 border-t border-slate-800">
+                            <p class="text-indigo-400 font-bold text-sm uppercase tracking-wider">Técnico em Informática
+                            </p>
+                            <p class="text-white text-sm">Universidade Cidade de São Paulo (2014 – 2015)</p>
+                            <ul class="mt-2 text-xs text-slate-500 space-y-1">
+                                <li>• Representante de turma</li>
+                                <li>• Melhor média acadêmica do semestre</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="p-8 bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-cyan-500 transition shadow-xl">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fas fa-globe text-cyan-400"></i> Idiomas
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <span class="text-white font-medium">Português</span>
+                            <span class="text-xs bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded">Nativo</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Inglês</span>
+                                <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded">Básico –
+                                    Intermediário</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2">
+                                <div class="bg-indigo-500 h-1.5 rounded-full shadow-[0_0_10px_#6366f1]"
+                                    style="width: 45%"></div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 italic mt-1 uppercase tracking-tighter">
+                                Duolingo Score: 72 (Jan/2026)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="p-8 bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-emerald-500 transition shadow-xl">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fas fa-award text-emerald-400"></i> Qualificações & Conquistas
+                    </h3>
+                    <ul class="space-y-4 text-sm text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <span>Modernização de Legados: Refatoração de PHP 5.x para PHP 8.x com padrões PSR.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <span>Segurança (OWASP): Revisão de fluxos de upload e mitigação de vulnerabilidades.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <span>Containerização: Experiência em Docker para builds reprodutíveis e isolamento.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <span>UI/UX: Migração de legados para interfaces modernas com Bootstrap 5.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center border-t border-slate-800 mt-20">
+        <p class="text-slate-500 text-xs tracking-widest uppercase">
+            Everson L. Santana — 2026 — Desenvolvedor Full Stack & IA Aplicada
+        </p>
+    </footer>
+
+    <div id="imageModal"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/95 p-4 backdrop-blur-md cursor-zoom-out">
+        <span
+            class="absolute top-6 right-8 text-white text-5xl cursor-pointer hover:text-indigo-500 transition-all">&times;</span>
+
+        <img id="modalImage"
+            class="max-w-full max-h-[90vh] rounded-lg shadow-2xl border border-slate-800 transition-transform duration-300 scale-95"
+            src="" alt="">
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "lil-gui": "https://unpkg.com/lil-gui@0.19.1/dist/lil-gui.esm.min.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import GUI from 'lil-gui';
+
+        // --- CONFIGURAÇÃO THREE.JS (ELEMENTOS DOM) ---
+        const dock = document.querySelector('.liquid-dock');
+        const canvas = document.getElementById('webgl-canvas');
+
+        // --- CENA E RENDERER ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 1000);
+        camera.position.z = 10;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform vec2 uScreenRes;
+            uniform vec2 uMeshSize;
+            uniform float uTime;
+            uniform float uScroll;
+            uniform float uRadius;
+            uniform float uDisplacement;
+            uniform float uPower;
+            uniform float uAberration;
+            uniform float uFresnel;
+            uniform float uNoise;
+            varying vec2 vUv;
+
+            float sdRoundedBox(vec2 p, vec2 b, float r) {
+                vec2 q = abs(p) - b + r;
+                return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
+            }
+
+            float random(vec2 p) {
+                return fract(sin(dot(p.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            void main() {
+                // 1. Geometria da Lente
+                vec2 center = vec2(0.5);
+                vec2 uvCentered = vUv - center;
+                uvCentered.x *= uMeshSize.x / uMeshSize.y;
+                float dist = length(uvCentered);
+
+                // 2. Máscara e Efeitos Pro (Camada de Luz)
+                vec2 pixelPos = (vUv - 0.5) * uMeshSize;
+                float d = sdRoundedBox(pixelPos, uMeshSize * 0.5, uRadius);
+                float alphaBase = 1.0 - smoothstep(0.0, 1.0, d);
+                
+                float edgeDist = abs(d);
+                float highlight = smoothstep(2.0, 0.0, edgeDist) * uFresnel * 2.0;
+                float whiteTint = (1.0 - dist) * 0.12; // Brilho central ajustado
+                float noise = (random(vUv * uTime * 0.01) - 0.5) * uNoise;
+
+                // Aplicamos uma cor de vidro levemente esbranquiçada e transparente no centro
+                vec3 finalColor = vec3(1.0, 1.0, 1.1) * 0.05 + highlight + whiteTint + noise;
+                
+                // O alpha é o segredo: deixamos o centro mais transparente para ver o DOM distorcido
+                float finalAlpha = alphaBase * (0.15 + highlight * 0.5);
+
+                gl_FragColor = vec4(finalColor, finalAlpha);
+            }
+        `;
+
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader, fragmentShader, transparent: true,
+            uniforms: {
+                uScreenRes: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                uMeshSize: { value: new THREE.Vector2(100, 100) },
+                uRadius: { value: 40.0 },
+                uTime: { value: 0.0 },
+                uScroll: { value: 0.0 },
+                uDisplacement: { value: 1.5 },
+                uPower: { value: 2.5 },
+                uAberration: { value: 0.8 },
+                uFresnel: { value: 0.15 },
+                uNoise: { value: 0.02 }
+            }
         });
 
-        move();
-    });
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+        scene.add(mesh);
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        const closeBtn = modal.querySelector('span');
-        const portfolioImages = document.querySelectorAll('#projects img');
+        const svgFeTurbulence = document.querySelector('#glass-distortion feTurbulence');
 
-        // Abre o modal ao clicar em qualquer imagem do portfólio
-        portfolioImages.forEach(img => {
-            img.classList.add('cursor-zoom-in'); // Adiciona o ícone de zoom no mouse
-            img.addEventListener('click', () => {
-                modal.classList.remove('hidden');
-                modalImg.src = img.src;
-                modalImg.alt = img.alt;
-                document.body.style.overflow = 'hidden'; // Trava o scroll do site
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!dock) return;
+            const r = dock.getBoundingClientRect();
+            mesh.position.set(r.left + r.width / 2 - window.innerWidth / 2, -(r.top + r.height / 2 - window.innerHeight / 2), 0);
+            mesh.scale.set(r.width, r.height, 1);
 
-                // Pequeno delay para a animação de entrada (scale)
+            const time = performance.now() / 1000;
+            material.uniforms.uMeshSize.value.set(r.width, r.height);
+            material.uniforms.uScreenRes.value.set(window.innerWidth, window.innerHeight);
+            material.uniforms.uTime.value = time;
+            material.uniforms.uScroll.value = window.scrollY;
+
+            // Animação Líquida do DOM (Filtro SVG)
+            if (svgFeTurbulence) {
+                // Variamos levemente a frequência para criar o efeito de ondulação
+                const freq = 0.015 + Math.sin(time * 0.5) * 0.002;
+                svgFeTurbulence.setAttribute('baseFrequency', freq.toString());
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.left = window.innerWidth / -2; camera.right = window.innerWidth / 2;
+            camera.top = window.innerHeight / 2; camera.bottom = window.innerHeight / -2;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- PAINEL DE CONTROLE (GUI) ---
+        /*const gui = new GUI({ title: 'Ajuste Fino - Liquid Glass' });
+
+        // Pasta Refração
+        const folderRef = gui.addFolder('Refração & Lente');
+        const params = {
+            displacement: material.uniforms.uDisplacement.value,
+            power: material.uniforms.uPower.value,
+            radius: material.uniforms.uRadius.value,
+            aberration: material.uniforms.uAberration.value,
+            fresnel: material.uniforms.uFresnel.value,
+            noise: material.uniforms.uNoise.value,
+            blur: 10 // Valor inicial do CSS blur
+        };*/
+
+        folderRef.add(params, 'displacement', -5.0, 5.0).name('Força (Displacement)').onChange(v => {
+            material.uniforms.uDisplacement.value = v;
+        });
+        folderRef.add(params, 'power', 1.0, 8.0).name('Curvatura (Power)').onChange(v => {
+            material.uniforms.uPower.value = v;
+        });
+        folderRef.add(params, 'radius', 0, 100).name('Arredondamento').onChange(v => {
+            material.uniforms.uRadius.value = v;
+        });
+
+        // Pasta Estética
+        const folderEst = gui.addFolder('Estética & Luz');
+        folderEst.add(params, 'aberration', 0.0, 5.0).name('Cromatismo (RGB)').onChange(v => {
+            material.uniforms.uAberration.value = v;
+        });
+        folderEst.add(params, 'fresnel', 0.0, 1.0).name('Brilho Borda').onChange(v => {
+            material.uniforms.uFresnel.value = v;
+        });
+        folderEst.add(params, 'noise', 0.0, 0.2).name('Granulado').onChange(v => {
+            material.uniforms.uNoise.value = v;
+        });
+        folderEst.add(params, 'blur', 0, 40).name('Blur (CSS)').onChange(v => {
+            dock.style.backdropFilter = `blur(${v}px) url(#glass-distortion)`;
+            dock.style.webkitBackdropFilter = `blur(${v}px) url(#glass-distortion)`;
+        });
+
+        // Novo controle para distorção real do DOM
+        params.domDistortion = 45;
+        const svgDistMap = document.getElementById('svg-dist-map');
+        svgDistMap.setAttribute('scale', params.domDistortion);
+        folderRef.add(params, 'domDistortion', 0, 100).name('Distorção Real (DOM)').onChange(v => {
+            svgDistMap.setAttribute('scale', v);
+        });
+
+        folderRef.open();
+        folderEst.open();
+
+        // --- LÓGICA ORIGINAL DO SITE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const interBubble = document.querySelector('.interactive');
+            let curX = 0;
+            let curY = 0;
+            let tgX = 0;
+            let tgY = 0;
+
+            function move() {
+                curX += (tgX - curX) / 20;
+                curY += (tgY - curY) / 20;
+                interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+                requestAnimationFrame(() => {
+                    move();
+                });
+            }
+
+            window.addEventListener('mousemove', (event) => {
+                tgX = event.clientX;
+                tgY = event.clientY;
+            });
+
+            move();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const closeBtn = modal.querySelector('span');
+            const portfolioImages = document.querySelectorAll('#projects img');
+
+            // Abre o modal ao clicar em qualquer imagem do portfólio
+            portfolioImages.forEach(img => {
+                img.classList.add('cursor-zoom-in'); // Adiciona o ícone de zoom no mouse
+                img.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                    modalImg.src = img.src;
+                    modalImg.alt = img.alt;
+                    document.body.style.overflow = 'hidden'; // Trava o scroll do site
+
+                    // Pequeno delay para a animação de entrada (scale)
+                    setTimeout(() => {
+                        modalImg.classList.remove('scale-95');
+                        modalImg.classList.add('scale-100');
+                    }, 10);
+                });
+            });
+
+            // Função para fechar o modal
+            const closeModal = () => {
+                modalImg.classList.remove('scale-100');
+                modalImg.classList.add('scale-95');
                 setTimeout(() => {
-                    modalImg.classList.remove('scale-95');
-                    modalImg.classList.add('scale-100');
-                }, 10);
-            });
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto'; // Destrava o scroll
+                }, 200);
+            };
+
+            // Fecha ao clicar no 'X', no fundo escuro ou apertar 'Esc'
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => { if (e.target !== modalImg) closeModal(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
         });
 
-        // Função para fechar o modal
-        const closeModal = () => {
-            modalImg.classList.remove('scale-100');
-            modalImg.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto'; // Destrava o scroll
-            }, 200);
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const blob = document.getElementById('nav-blob');
+            const links = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
 
-        // Fecha ao clicar no 'X', no fundo escuro ou apertar 'Esc'
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => { if(e.target !== modalImg) closeModal(); });
-        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
-    });
+            const moveBlob = (target) => {
+                if (!target) return;
+                // Cálculos precisos para posicionar a bolha
+                const width = target.offsetWidth;
+                const left = target.offsetLeft;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const blob = document.getElementById('nav-blob');
-        const links = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
+                blob.style.width = `${width}px`;
+                blob.style.transform = `translateX(${left}px)`; // Usar transform é mais performático
+            };
 
-        const moveBlob = (target) => {
-            if (!target) return;
-            // Cálculos precisos para posicionar a bolha
-            const width = target.offsetWidth;
-            const left = target.offsetLeft;
+            // Configuração Inicial
+            const activeLink = document.querySelector('.nav-link.active');
+            // Pequeno delay para garantir que o navegador renderizou as fontes e larguras
+            setTimeout(() => moveBlob(activeLink), 100);
 
-            blob.style.width = `${width}px`;
-            blob.style.transform = `translateX(${left}px)`; // Usar transform é mais performático
-        };
+            // --- CORREÇÃO DO SCROLL SPY ---
+            const observerOptions = {
+                root: null,
+                // margin negativa cria uma "linha invisível" no centro da tela
+                // O observer só dispara quando a seção cruza essa linha central
+                rootMargin: "-45% 0px -45% 0px",
+                threshold: 0
+            };
 
-        // Configuração Inicial
-        const activeLink = document.querySelector('.nav-link.active');
-        // Pequeno delay para garantir que o navegador renderizou as fontes e larguras
-        setTimeout(() => moveBlob(activeLink), 100);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        const targetLink = document.querySelector(`.nav-link[href="#${id}"]`);
 
-        // --- CORREÇÃO DO SCROLL SPY ---
-        const observerOptions = {
-            root: null,
-            // margin negativa cria uma "linha invisível" no centro da tela
-            // O observer só dispara quando a seção cruza essa linha central
-            rootMargin: "-45% 0px -45% 0px",
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    const targetLink = document.querySelector(`.nav-link[href="#${id}"]`);
-
-                    if (targetLink) {
-                        // Remove active de todos
-                        links.forEach(l => l.classList.remove('active'));
-                        // Adiciona ao atual
-                        targetLink.classList.add('active');
-                        // Move a bolha
-                        moveBlob(targetLink);
+                        if (targetLink) {
+                            // Remove active de todos
+                            links.forEach(l => l.classList.remove('active'));
+                            // Adiciona ao atual
+                            targetLink.classList.add('active');
+                            // Move a bolha
+                            moveBlob(targetLink);
+                        }
                     }
-                }
+                });
+            }, observerOptions);
+
+            sections.forEach(s => observer.observe(s));
+
+            // Hover Effect (Mantido)
+            links.forEach(link => {
+                link.addEventListener('mouseenter', (e) => moveBlob(e.target));
+                link.addEventListener('mouseleave', () => {
+                    const currentActive = document.querySelector('.nav-link.active');
+                    moveBlob(currentActive);
+                });
             });
-        }, observerOptions);
 
-        sections.forEach(s => observer.observe(s));
-
-        // Hover Effect (Mantido)
-        links.forEach(link => {
-            link.addEventListener('mouseenter', (e) => moveBlob(e.target));
-            link.addEventListener('mouseleave', () => {
+            // Ajuste no Resize
+            window.addEventListener('resize', () => {
                 const currentActive = document.querySelector('.nav-link.active');
                 moveBlob(currentActive);
             });
         });
 
-        // Ajuste no Resize
-        window.addEventListener('resize', () => {
-            const currentActive = document.querySelector('.nav-link.active');
-            moveBlob(currentActive);
-        });
-    });
-</script>
+    </script>
 </body>
+
 </html>
